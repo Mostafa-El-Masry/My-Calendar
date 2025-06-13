@@ -1,0 +1,96 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #e9eff1;
+  margin: 0;
+  padding: 20px;
+  color: #444;
+}
+
+.calendar-container {
+  max-width: 1200px;
+  margin: auto;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background: white;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #2c3e50;
+  font-size: 2.5em;
+  text-transform: uppercase;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr); /* 7 days */
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.time-cell, .day-cell, .slot {
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  min-height: 100px;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.day-header {
+  font-weight: bold;
+  background-color: #f1f1f1;
+  border-bottom: 2px solid #ccc;
+  color: #2980b9;
+}
+
+.time-cell {
+  background-color: #f3f4f6;
+  font-weight: bold;
+  text-align: center;
+}
+
+.slot {
+  background-color: #fff;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.slot:hover {
+  background-color: #eef2f7;
+  transform: scale(1.02);
+}
+
+.event {
+  position: absolute;
+  width: 90%;
+  left: 5%;
+  top: 5px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  color: white;
+  font-size: 0.9em;
+  cursor: move;
+  z-index: 1;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.color-blue { background-color: #3498db; }
+.color-green { background-color: #2ecc71; }
+.color-purple { background-color: #9b59b6; }
+.color-pink { background-color: #e74c3c; }
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.arrow {
+  cursor: pointer;
+  font-size: 1.5em;
+  user-select: none;
+}

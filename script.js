@@ -1,74 +1,117 @@
-const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-];
+const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const startHour = 9;
+const endHour = 23;
+const colors = ['color-blue', 'color-green', 'color-purple', 'color-pink'];
+let currentColorIndex = 0;
+let eventCount = 0;
+let currentWeekStart = new Date(); // Start from today
 
-const date = new Date();
-let currentMonth = date.getMonth();
-let currentYear = date.getFullYear();
+// Set to the start of the week (Sunday)
+currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay());
 
-const monthElement = document.querySelector('.date');
-const prevBtn = document.querySelector('.prev');
-const nextBtn = document.querySelector('.next');
-const calendarDiv = document.querySelector('.calendar');
+// Get the calendar element
+const calendar = document.getElementById('calendar');
 
-function renderCalendar(month, year) {
-    // Remove old days grid if exists
-    const oldDays = document.querySelector('.days');
-    if (oldDays) oldDays.remove();
-
-    // Get first day and total days in month
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    // Create days grid
-    const daysDiv = document.createElement('div');
-    daysDiv.className = 'days';
-
-    // Add blank days for previous month
-    for (let i = 0; i < firstDay; i++) {
-        const blank = document.createElement('div');
-        blank.className = 'day blank';
-        daysDiv.appendChild(blank);
-    }
-
-    // Add days of current month
-    for (let d = 1; d <= daysInMonth; d++) {
-        const day = document.createElement('div');
-        day.className = 'day';
-        day.textContent = d;
-        // Highlight today
-        if (
-            d === date.getDate() &&
-            month === date.getMonth() &&
-            year === date.getFullYear()
-        ) {
-            day.classList.add('today');
-        }
-        daysDiv.appendChild(day);
-    }
-
-    calendarDiv.appendChild(daysDiv);
-    monthElement.textContent = `${monthNames[month]} ${year}`;
+// Load events from local storage
+function loadEvents() {
+  const savedEvents = JSON.parse(localStorage.getItem('calendarEvents')) || [];
+  savedEvents.forEach(event => {
+    addEventToSlot(event.slotId, event.text, event.color, event.id);
+  });
 }
 
-prevBtn.addEventListener('click', () => {
-    currentMonth--;
-    if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
+// Add event to slot
+function addEventToSlot(slotId, text, color, id) {
+  const slot = document.getElementById(slotId);
+  const eventEl = document.createElement('div');
+  eventEl.className = `event ${color}`;
+  eventEl.contentEditable = true;
+  eventEl.innerText = text;
+  eventEl.id = id;
+  eventEl.setAttribute('draggable', true);
+  eventEl.addEventListener('dragstart', drag);
+  slot.appendChild(eventEl);
+}
+
+// Render calendar for the current week
+function renderCalendar() {
+  calendar.innerHTML = `<div class="time-cell"></div>`;
+  for (let d = 0; d < 7; d++) {
+    const date = new Date(currentWeekStart);
+    date.setDate(currentWeekStart.getDate() + d);
+    const label = `${days[date.getUTCDay()]}<br>${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    calendar.innerHTML += `<div class="day-cell day-header">${label}</div>`;
+  }
+
+  // Time + Slots
+  for (let hour = startHour; hour < endHour; hour += 2) {
+    const label = `${hour % 12 || 12}:00 ${hour < 12 ? 'AM' : 'PM'}`;
+    calendar.innerHTML += `<div class="time-cell">${label}</div>`;
+    for (let d = 0; d < 7; d++) {
+      const slotId = `slot-${hour}-${d}`;
+      calendar.innerHTML += `<div class="slot" id="${slotId}" ondrop="drop(event)" ondragover="allowDrop(event)" onclick="addEvent('${slotId}')"></div>`;
     }
-    renderCalendar(currentMonth, currentYear);
+  }
+
+  loadEvents(); // Load events for the current week
+}
+
+// Event Handlers
+window.addEventListener('DOMContentLoaded', () => {
+  renderCalendar();
 });
 
-nextBtn.addEventListener('click', () => {
-    currentMonth++;
-    if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-    }
-    renderCalendar(currentMonth, currentYear);
-});
+function allowDrop(ev) {
+  ev.preventDefault();
+}
 
-// Initial render
-renderCalendar(currentMonth, currentYear);
+function drag(ev) {
+  ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  const data = ev.dataTransfer.getData("text");
+  const eventEl = document.getElementById(data);
+  if (ev.target.classList.contains('slot')) {
+    ev.target.appendChild(eventEl);
+    saveEvents(); // Save events after dropping
+  }
+}
+
+function saveEvents() {
+  const events = [];
+  document.querySelectorAll('.event').forEach(el => {
+    const slotId = el.parentElement.id;
+    events.push({
+      slotId: slotId,
+      text: el.innerText,
+      color: el.className.split(' ').slice(1).join(' '),
+      id: el.id
+    });
+  });
+  localStorage.setItem('calendarEvents', JSON.stringify(events));
+}
+
+function addEvent(slotId) {
+  const eventText = prompt("Enter event:");
+  if (!eventText) return;
+
+  const color = colors[currentColorIndex % colors.length];
+  currentColorIndex++;
+
+  const id = `event-${eventCount++}`;
+  addEventToSlot(slotId, eventText, color, id);
+  saveEvents(); // Save events after adding
+}
+
+// Navigation functions
+function nextWeek() {
+  currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+  renderCalendar();
+}
+
+function previousWeek() {
+  currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+  renderCalendar();
+}
