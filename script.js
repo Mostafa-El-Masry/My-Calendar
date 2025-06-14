@@ -30,7 +30,27 @@ function addEventToSlot(slotId, text, color, id) {
   eventEl.id = id;
   eventEl.setAttribute('draggable', true);
   eventEl.addEventListener('dragstart', drag);
+
+  // Create delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+  deleteBtn.className = 'delete-btn';
+  deleteBtn.onclick = function(e) {
+    e.stopPropagation(); // Prevent triggering slot click
+    deleteEvent(id);
+  };
+
+  eventEl.appendChild(deleteBtn);
   slot.appendChild(eventEl);
+}
+
+// Delete event by id
+function deleteEvent(eventId) {
+  const eventEl = document.getElementById(eventId);
+  if (eventEl) {
+    eventEl.parentElement.removeChild(eventEl);
+    saveEvents();
+  }
 }
 
 // Render calendar for the current week
