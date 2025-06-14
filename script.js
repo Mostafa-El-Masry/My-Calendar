@@ -99,6 +99,7 @@ function addEventToSlot(slotId, text, color, id, date, completed) {
   toggleBtn.addEventListener('click', function() {
     event.style.opacity = event.style.opacity === '0.6' ? '1' : '0.6';
     event.style.textDecoration = event.style.textDecoration === 'line-through' ? 'none' : 'line-through';
+    event.style.backgroundColor = event.style.backgroundColor === '#28a745' ? 'none' : '#28a745 '; // Green for completed
     toggleBtn.innerHTML = toggleBtn.innerHTML === '✓' ? '○' : '✓';
     saveEvents();
   });
