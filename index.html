@@ -10,12 +10,12 @@
   <div class="calendar-container">
     <h1>Weekly Planner</h1>
     <div class="navigation">
-      <span class="arrow" onclick="previousWeek()">&#9664;</span>
-      <span class="arrow" onclick="nextWeek()">&#9654;</span>
+      <button class="nav-btn" onclick="previousWeek()">Previous</button>
+      <button class="nav-btn" onclick="snapToToday()">Today</button>
+      <button class="nav-btn" onclick="nextWeek()">Next</button>
     </div>
     <div class="calendar" id="calendar"></div>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>

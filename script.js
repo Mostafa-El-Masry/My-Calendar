@@ -1,6 +1,6 @@
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const startHour = 9;
-const endHour = 23;
+const endHour = 20; // 9 AM to 8 PM
 let eventCount = 0;
 let currentWeekStart = new Date(); // Start from today
 
@@ -37,7 +37,11 @@ function generateCalendar() {
   for (let h = startHour; h <= endHour; h++) {
     const timeCell = document.createElement('div');
     timeCell.className = 'time-cell';
-    timeCell.textContent = `${h}:00`;
+
+    // Add AM/PM to the time
+    const period = h < 12 ? 'AM' : 'PM';
+    const formattedHour = h % 12 === 0 ? 12 : h % 12;
+    timeCell.textContent = `${formattedHour}:00 ${period}`;
     calendar.appendChild(timeCell);
 
     for (let d = 0; d < 7; d++) {
@@ -209,6 +213,15 @@ function previousWeek() {
 
 function nextWeek() {
   currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+  generateCalendar();
+  loadEvents();
+}
+
+function snapToToday() {
+  currentWeekStart = new Date();
+  const dayOfWeek = currentWeekStart.getDay();
+  const daysSinceSaturday = (dayOfWeek + 1) % 7;
+  currentWeekStart.setDate(currentWeekStart.getDate() - daysSinceSaturday);
   generateCalendar();
   loadEvents();
 }
